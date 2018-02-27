@@ -1,0 +1,149 @@
+﻿<div class="mainDisplayPage" style="margin-top: 15px; margin-bottom: 10px;">
+    <div class="col-md-6 col-md-offset-3" ng-show="ctrl.pageLoading">
+        <div class="progress progress-striped active">
+            <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            </div>
+        </div>
+    </div>
+    <div class="spinner-container">
+        <spinner name="spinner" show="ctrl.newsLoading" register="false">
+            <div class="spinner-overlay"></div>
+            <div class="spinner">
+                <i class="spinners fa fa-circle-o-notch fa-spin fa-5x fa-fw"></i>
+            </div>
+        </spinner>
+        <mobile-navigation-pod></mobile-navigation-pod>
+        <div id="builtVehicle{{$index}}" ng-repeat="vehicle in ctrl.builtVehicles" ng-cloak>
+            <div class="NarrowBoxGaps" ng-class="ctrl.vehicleWidthClass" ng-drop="true" ng-drop-success="onDropComplete(vehicle, $data, $event)">
+                <div class="panel-group" ng-drag="true" ng-mousedown="onDragStart($data, $event)" ng-mouseup="onDragStop($data, $event)" ng-drag-data="vehicle">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                        </div>
+                        <div class="panel-heading" data-toggle="collapse" data-target="#collapseOne" style="padding:0;">
+                            <h3 class="panel-title text-center optionsIconChange vehicleHeader" ng-class="{addlist: ctrl.compareVehiclesAdd(vehicle.vehicleId)}" ng-init="ctrl.equalizeVehicleHeaderHeights()">
+                                <a data-toggle="collapse" data-target="#vehicle{{$index}}">
+                                    <span class="VehicleName">{{vehicle.vehicleName}}</span>
+                                    <span class="VehicleName">{{vehicle.vehicleHeaderInfo.displayPrice}}</span>
+                                    <img ng-src="{{vehicle.vehicleHeaderInfo.countryFlagPath}}" ng-attr-title="{{vehicle.vehicleHeaderInfo.countryName}}" class="img-responsive flagDisplayMainPages" />
+                                    <span ng-show="vehicle.isBenchmark" class="benchmark badge"><i class="glyphicon glyphicon-star-empty" title="{{applicationText.tryGet('cs5benchmark')}}"></i></span>
+                                </a>
+                            </h3>
+                        </div>
+                        <div id="vehicle{{$index}}" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <div class="thumbnail" style="margin-bottom: 0;">
+                                        <div class="text-center">
+                                            <img ng-src="{{vehicleImages[$index].url}}" class="img-responsive" />
+                                        </div>
+                                        <vehicle-actions vehicleId="{{vehicle.vehicleId}}"></vehicle-actions>
+
+                                    <!-- Build Panel Collapse -->
+                                    <div class="spinner-container buildOptionPanel" ng-style="{'height': ctrl.buildOptionHeight()}">
+                                        <spinner name="spinner" show="ctrl.spinnerLoading" register="false">
+                                            <div class="spinner-overlay"></div>
+                                            <div class="spinner">
+                                                <i class="spinner fa fa-circle-o-notch fa-spin fa-5x fa-fw"></i>
+                                            </div>
+                                        </spinner>
+                                        <div class="panel panel-default" style="border: none;" ng-show="ctrl.checkbuildoptions(ctrl.buildOptionList,vehicle.vehicleId) > 0">
+                                            <div class="panel-heading" data-toggle="collapse" data-target="#collapseOne" style="background-color: transparent;">
+                                                <h4 class="panel-title text-center caret-heading">
+                                                    <a ng-class="{collapsed: !ctrl.optionBuildOpen}" ng-click="ctrl.refresh()">
+                                                        <span>{{applicationText.tryGet("cs5builtoptions")}}</span>
+                                                    </a>
+                                                    <span></span>
+                                                </h4>
+                                            </div>
+                                            <display-built-options></display-built-options>
+                                        </div>
+                                        <div ng-hide="ctrl.checkbuildoptions(ctrl.buildOptionList,vehicle.vehicleId) > 0">
+                                            <h4 class="panel-title text-center caret-heading" ng-show="ctrl.buildOptionList.length >0">
+                                                <span>{{applicationText.tryGet("cs5nobuiltoptions")}}</span>
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Option panel collapse -->
+                                <div class="panel panel-default" style="border: none;">
+                                    <div class="panel-heading" data-toggle="collapse" data-target="#collapseOne" style="background-color: transparent;">
+                                        <h4 class="panel-title text-center optionTitle brochureIconChange" style="">
+                                            <a ng-class="{collapsed: !ctrl.areAllOpen}" ng-click="ctrl.toggleAllOpen()">
+                                                <span>{{ctrl.titleToDisplay}}</span>
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <a ng-click="optionSearch = !optionSearch" class="pull-left search"> <i class="glyphicon glyphicon-search"></i></a>
+                                    <div id="vehicleoptions{{vehicle.vehicleId}}" class="panel-collapse collapse in">
+                                        <div class="panel-body">
+
+                                            <div class="" style="padding: 10px;" ng-show="optionSearch">
+                                                <div class="input-group input-group-sm">
+                                                    <input id="text-search" type="text" class="form-control" ng-keyup="ctrl.highlightText(vehicle.vehicleId);" ng-model="search" ng-cancel-drag placeholder="{{applicationText.tryGet('cs5searchforoptions')}}">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="ctrl.highlightText(vehicle.vehicleId);">
+                                                            <span class="glyphicon glyphicon-search"></span>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <!-- Begin Options-->
+                                            <accordion close-others="false">
+                                                <accordion-group id="{{category.id}}" ng-repeat="category in vehicle.ebrochurePageOptions | filter:search" ng-init="ctrl.toggleThisCategory(category, vehicle)"
+                                                                 class="insidePanelDisplay insidePanelPadding" is-open="ctrl.isCategoryOpen[category.categoryName].open">
+                                                    <accordion-heading>
+                                                        <span>{{category.translatedCategoryName}}</span>
+                                                    </accordion-heading>
+                                                    <table class="content table table-striped">
+                                                        <tr><td></td></tr>
+                                                    </table>
+                                                </accordion-group>
+                                            </accordion>
+                                            <!-- End Options -->
+                                            <div class="table table-bordered table-striped" ng-if="vehicle.ebrochurePageOptions.length === 0" style="text-align: center; padding: 10px;">
+                                                No missing items available
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Option panel collapse -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal " id="myModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <a class="btn btn-default btn-xs pull-right" ng-click="closePopUpPanel();"><i class="glyphicon glyphicon-remove"></i></a>
+                        <div id="vehicleOptionData"></div>
+                    </div>
+                    <div class="modal-body" style="padding: 0;">
+                        <div id="optionData"><!-- Data From Scripts/myScript.js --></div>
+                    </div>
+                    <div class="modal-footer" style="border-top: none; padding: 15px;">
+                        <div class="col-sm-4 pull-right">
+                            <div class="btn-group btn-group-justified">
+                                <!--<a class="btn btn-default pull-left" onclick="editOptionPrice();">Edit</a>-->
+                                <a class="btn btn-jato requireBtn" ng-click="ctrl.requireBuildOption(false)">{{applicationText.tryGet('cs5build')}}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Ends -->
+
+    </div>
+</div>
+<script>
+    //Enable draggable modal
+    $("#myModal .modal-dialog").draggable({
+        handle: ".modal-header",
+        containment: "parent",
+        scroll: false
+    });
+</script>
